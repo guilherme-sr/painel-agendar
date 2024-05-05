@@ -1,0 +1,12 @@
+.dash-header {
+  padding: 8px 0;
+  background: #00a0e9;
+}
+.calendar-meeting:hover {
+  background-color: #d8e6ff;
+}
+.calendar-meeting {
+  padding: 0 10px;
+  border-radius: 10px;
+  width: 80%;
+}

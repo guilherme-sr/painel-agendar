@@ -1,0 +1,13 @@
+.form-login {
+  width: 80vw !important;
+  max-width: 350px;
+  padding: 5%;
+  background-color: white;
+  border-radius: 10px;
+}
+.login-error {
+  color: red;
+}
+body {
+  background-color: var(--lt-color-background-default);
+}

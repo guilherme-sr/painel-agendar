@@ -1,0 +1,11 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE0MjU4Mjg4LCJleHAiOjE3MTY4NTAyODh9.dOokTc9B79DdOUkK7Ne5DL85A-JOl9Cc3LXqR_3nlVc
+
+### Get All Meetings
+GET http://192.168.1.125:1337/api/Meetings
+Authorization: Bearer {{token}}
+
+
+
+###
+GET http://192.168.1.125:1337/api/Meetings?sort=name:ASC&filters[$and][0][start][$gte]=2024-04-01T03:00:00.000Z&filters[$and][1][start][$lte]=2024-05-01T02:59:00.000Z&populate=room&populate=creator
+Authorization: Bearer {{token}}

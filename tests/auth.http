@@ -1,0 +1,7 @@
+POST http://192.168.1.125:1337/api/auth/local HTTP/1.1
+content-type: application/json
+
+{
+    "identifier": "guilherme.ribeiro@refrix.com.br",
+    "password": "A952f25162784b55f739793259c4f2c"
+}
