@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import {
   Button,
-  Modal,
   Form,
   Input,
   DatePicker,
@@ -12,33 +11,27 @@ import {
   Flex,
 } from "antd";
 import dayjs from "dayjs";
+import { XFilled } from "@ant-design/icons";
+import RoomsContext from "../../contexts/RoomsContext";
+import { ModalContext } from "../../contexts/ModalContext";
+import { log } from "console";
 
 const dateFormat = "DD-MM-YYYY";
 
 interface ModalProps {
-  rooms: { key: string; label: string; icon: string }[];
   closeModal: () => void;
-  userId?: number;
-  modalTitle: string;
-  editName: string;
-  editDescription: string;
-  editStart: string;
-  editEnd: string;
-  editRoom: string;
+}
+
+interface userDataInterface {
+  id: number;
 }
 
 const CreateMeeting: React.FC<ModalProps> = (props) => {
-  const {
-    rooms,
-    closeModal,
-    userId,
-    modalTitle,
-    editName,
-    editDescription,
-    editEnd,
-    editStart,
-    editRoom,
-  } = props;
+  const { closeModal } = props;
+
+  const { rooms } = useContext(RoomsContext);
+  // const { changeModalTitle } = useContext(ModalContext);
+
   const [meeting, setMeeting] = useState({
     name: "",
     description: "",
@@ -54,12 +47,33 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
   const [participants, setParticipants] = useState<string[]>([]);
   const [currentEmail, setCurrentEmail] = useState("");
 
-  const [mName, setMName] = useState("");
-  const [mDescription, setMDescription] = useState("");
-  const [mStart, setMStart] = useState("");
-  const [mEnd, setMEnd] = useState("");
-  const [mRoom, setMRoom] = useState("");
-  const [mParticipants, setMParticipants] = useState<string[]>([]);
+  const [createName, setCreateName] = useState("");
+  const [createDescription, setCreateDescription] = useState("");
+  const [createDate, setCreateDate] = useState(dayjs().toString());
+  const [createDuration, setCreateDuration] = useState("");
+  const [createParticipants, setCreateParticipants] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState<number | null>(null);
+
+  const [userData, setUserData] = useState<userDataInterface>({ id: 0 });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(
+          "http://192.168.1.125:1337/api/Users/me",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Erro ao recuperar os dados do usuário:", error);
+      }
+    };
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     if (success) {
@@ -83,26 +97,6 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
     }
   }, [error]);
 
-  const datetimeToMinutes = () => {
-    const start = dayjs(mStart);
-    console.log("🚀 ~ datetimeToMinutes ~ dayjs(mStart):", dayjs(mStart));
-    console.log("🚀 ~ datetimeToMinutes ~ mStart:", mStart);
-    // const end = dayjs(mEnd);
-    // const minutes = end.diff(start);
-    // console.log(minutes);
-    // return minutes;
-    return 15;
-  };
-
-  useEffect(() => {
-    editName && setMName(editName);
-    editDescription && setMDescription(editDescription);
-    editStart && setMStart(editStart.replace(/Z$/, ""));
-    editEnd && setMEnd(editEnd.replace(/Z$/, ""));
-    editEnd && setEndMinutes(datetimeToMinutes());
-    editRoom && setMRoom(editRoom);
-  }, []);
-
   const handleKeyDown = (e: any) => {
     if (e.key === "Enter" && isValidEmail(currentEmail)) {
       if (!participants.includes(currentEmail)) {
@@ -118,13 +112,6 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
     // Expressão regular para validar o formato do email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
-  };
-
-  const updateMeetingField = (field: any, value: any) => {
-    setMeeting((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
   };
 
   const removeParticipant = (notParticipant: any) => {
@@ -144,7 +131,7 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
     setSuccess(false);
     const final_meeting = {
       ...meeting,
-      creator: userId,
+      creator: userData.id,
       end: dayjs(dayjs(meeting.start).add(endMinutes, "minute"))
         .format("YYYY-MM-DD HH:mm:ss")
         .toString(),
@@ -156,12 +143,12 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
         "http://192.168.1.125:1337/api/meetings",
         {
           data: {
-            name: mName,
-            description: mDescription,
-            start: mStart,
-            room: getRoomId(mRoom),
-            creator: userId,
-            end: dayjs(dayjs(mStart).add(endMinutes, "minute")),
+            name: createName,
+            description: createDescription,
+            start: createDate,
+            room: selectedRoom,
+            creator: userData.id,
+            end: dayjs(dayjs(createDate).add(endMinutes, "minute")),
           },
         },
         {
@@ -188,6 +175,11 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
     }
   };
 
+  const handleSelectChange = (value: number) => {
+    console.log(`selected ${value}`);
+    setSelectedRoom(value);
+  };
+
   return (
     <>
       <Form
@@ -200,8 +192,8 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
           rules={[{ required: true, message: "Insira o nome do agendamento!" }]}
         >
           <Input
-            value={mName}
-            onChange={(e) => updateMeetingField("name", e.target.value)}
+            value={createName}
+            onChange={(e) => setCreateName(e.target.value)}
           />
         </Form.Item>
         <Flex gap="large">
@@ -217,10 +209,9 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
             <DatePicker
               showTime
               minDate={dayjs(dayjs(), dateFormat)}
-              value={dayjs(mStart.replace(/Z$/, ""))}
-              defaultValue={dayjs(mStart.replace(/Z$/, ""))}
+              value={dayjs(createDate)}
               onChange={(_, dateString) => {
-                setMStart(dateString.toString());
+                setCreateDate(dateString.toString());
               }}
             />
           </Form.Item>
@@ -251,15 +242,17 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
         >
           {rooms && (
             <Select
-              value={mRoom}
-              onChange={(value) => setMRoom(value)}
+              value={selectedRoom}
+              onChange={handleSelectChange}
               options={rooms.map((room) => {
                 return {
-                  value: room.key,
+                  value: room.id,
                   label: (
                     <span>
-                      <span>{room.icon} </span>
-                      {room.label}
+                      <span>
+                        <XFilled style={{ color: room.attributes.color }} />
+                      </span>
+                      {" " + room.attributes.name}
                     </span>
                   ),
                 };
@@ -269,8 +262,8 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
         </Form.Item>
         <Form.Item label="Descrição" name="description">
           <Input.TextArea
-            value={mDescription}
-            onChange={(e) => setMDescription(e.target.value)}
+            value={createDescription}
+            onChange={(e) => setCreateDescription(e.target.value)}
             autoSize={{ minRows: 2, maxRows: 6 }}
           />
         </Form.Item>

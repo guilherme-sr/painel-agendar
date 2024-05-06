@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import {
   Button,
@@ -12,17 +12,21 @@ import {
   Flex,
 } from "antd";
 import dayjs from "dayjs";
+import { XFilled } from "@ant-design/icons";
+
+import RoomsContext from "../contexts/RoomsContext";
 
 const dateFormat = "DD-MM-YYYY";
 
 interface ModalProps {
-  rooms: { key: string; label: string; icon: string }[];
   closeModal: () => void;
   userId: number;
 }
 
 const NewMeeting: React.FC<ModalProps> = (props) => {
-  const { rooms, closeModal, userId } = props;
+  const { closeModal, userId } = props;
+  const { rooms } = useContext(RoomsContext);
+
   const [meeting, setMeeting] = useState({
     name: "",
     description: "",
@@ -86,6 +90,17 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
 
   const removeParticipant = (notParticipant: any) => {
     setParticipants(participants.filter((pt) => pt !== notParticipant));
+  };
+
+  const getSelectRooms = (rooms: {
+    [x: string]: any;
+    hasOwnProperty: (arg0: string) => any;
+  }) => {
+    for (const key in rooms) {
+      if (rooms.hasOwnProperty(key)) {
+        const room = rooms[key];
+      }
+    }
   };
 
   const getRoomId = (roomKey: string) => {
@@ -224,11 +239,13 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
             onChange={(value) => updateMeetingField("room", value)}
             options={rooms.map((room) => {
               return {
-                value: room.key,
+                value: room.id,
                 label: (
                   <span>
-                    <span>{room.icon} </span>
-                    {room.label}
+                    <span>
+                      <XFilled style={{ color: room.attributes.color }} />
+                    </span>
+                    {room.attributes.name}
                   </span>
                 ),
               };

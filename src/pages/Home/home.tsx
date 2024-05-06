@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import MainCalendar from "../../components/MainCalendar";
 import RightMenu from "../../components/RightMenu";
@@ -6,7 +6,8 @@ import { Layout } from "antd";
 import "./home.css";
 import MyMeetings from "../../components/MyMeetings";
 import axios from "axios";
-import { XFilled } from "@ant-design/icons";
+import RoomsContext from "../../contexts/RoomsContext";
+import { ModalContext } from "../../contexts/ModalContext";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -15,7 +16,15 @@ const Home: React.FC = () => {
   const [logged, setLogged] = useState<boolean>(false);
   const [content, setContent] = useState<number>(3);
   const [userData, setUserData] = useState<any>(null);
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState([]);
+
+  // Modal
+  const [inModalName, setInModalName] = useState("");
+  const [inModalDate, setInModalDate] = useState("");
+  const [inModalDuration, setInModalDuration] = useState("");
+  const [inModalRoom, setInModalRoom] = useState("");
+  const [inModalDescription, setInModalDescription] = useState("");
+  const [inModalParticipants, setInModalParticipants] = useState("");
 
   useEffect(() => {
     const tokenLS = localStorage.getItem("token");
@@ -57,21 +66,7 @@ const Home: React.FC = () => {
             },
           }
         );
-        response.data.data.forEach(
-          (item: { id: number; attributes: { name: any; color: string } }) => {
-            const novosItens = response.data.data.map(
-              (newItem: {
-                id: number;
-                attributes: { name: any; color: any };
-              }) => ({
-                label: newItem.attributes.name,
-                key: `room_${newItem.id}`,
-                icon: <XFilled style={{ color: newItem.attributes.color }} />,
-              })
-            );
-            setRooms(novosItens);
-          }
-        );
+        setRooms(response.data.data);
       } catch (error) {
         console.error("Erro ao recuperar as salas:", error);
       }
@@ -86,33 +81,32 @@ const Home: React.FC = () => {
   return (
     <div className="home">
       {logged && (
-        <Layout
-          style={{
-            margin: "25px 10px 0 ",
-            borderRadius: "10px",
-            background: "white",
-          }}
-        >
-          <Sider
-            width={255}
+        <RoomsContext.Provider value={{ rooms }}>
+          <Layout
             style={{
+              margin: "25px 10px 0 ",
+              borderRadius: "10px",
               background: "white",
-              borderRight: "1px solid #ddd",
-              borderRadius: "10px 0 0 10px",
             }}
           >
-            <RightMenu
-              userdata={userData}
-              selectContent={handleContent}
-              rooms={rooms}
-            />
-          </Sider>
-          <Content style={{ padding: "10px 80px 80px 80px", minHeight: 280 }}>
-            {content == 1 && <MyMeetings userId={"1"} rooms={rooms} />}
-            {content == 2 && <div>Configurações</div>}
-            {content == 3 && <MainCalendar />}
-          </Content>
-        </Layout>
+            <Sider
+              width={255}
+              style={{
+                background: "white",
+                borderRight: "1px solid #ddd",
+                borderRadius: "10px 0 0 10px",
+              }}
+            >
+              <RightMenu userdata={userData} selectContent={handleContent} />
+            </Sider>
+
+            <Content style={{ padding: "10px 80px 80px 80px", minHeight: 280 }}>
+              {content == 1 && <MyMeetings userId={"1"} />}
+              {content == 2 && <div>Configurações</div>}
+              {content == 3 && <MainCalendar />}
+            </Content>
+          </Layout>
+        </RoomsContext.Provider>
       )}
     </div>
   );

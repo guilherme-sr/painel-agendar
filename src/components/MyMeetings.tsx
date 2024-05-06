@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { List, Card, Flex, Divider, Skeleton } from "antd";
 import axios from "axios";
 import { XFilled, EditOutlined } from "@ant-design/icons";
 import SkeletonCards from "./SkeletonCards";
 import ModalMeeting from "./ModalMeeting";
 import dayjs from "dayjs";
+import RoomsContext from "../contexts/RoomsContext";
+import { ModalProvider } from "../contexts/ModalContext";
+import MainModal from "./Modal/MainModal";
 
 interface MyMeetingsIfc {
   userId: string;
-  rooms: { key: string; label: string; icon: string }[];
 }
 interface MeetingsIfc {
   id: number;
@@ -33,7 +35,8 @@ interface MeetingsIfc {
 }
 
 const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
-  const { userId, rooms } = props;
+  const { userId } = props;
+  const { rooms } = useContext(RoomsContext);
 
   const [meetings, setMeetings] = useState<MeetingsIfc[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +47,7 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
   const [editDescription, setEditDescription] = useState("");
   const [editRoom, setEditRoom] = useState("");
 
-  const hideModal = () => {
+  const handleModalClose = () => {
     setModalVisible(false);
   };
 
@@ -82,16 +85,18 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
     <Flex vertical>
       <span className="title">Meus Agendamentos</span>
       {modalVisible && (
-        <ModalMeeting
-          closeModal={hideModal}
-          modalTitle={"Meu Agendamento"}
-          editName={editName}
-          editStart={editStart}
-          editEnd={editEnd}
-          editDescription={editDescription}
-          editRoom={editRoom}
-          rooms={rooms}
-        />
+        // <ModalMeeting
+        //   closeModal={hideModal}
+        //   modalTitle={"Meu Agendamento"}
+        //   editName={editName}
+        //   editStart={editStart}
+        //   editEnd={editEnd}
+        //   editDescription={editDescription}
+        //   editRoom={editRoom}
+        // />
+        <ModalProvider>
+          <MainModal edit loading={false} closeModal={handleModalClose} />
+        </ModalProvider>
       )}
       <Divider />
       {loading && <SkeletonCards count={9} cardsPerRow={3} />}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Menu, Button, Divider, Flex } from "antd";
 import {
   AppstoreOutlined,
@@ -7,18 +7,21 @@ import {
   PlusCircleOutlined,
   XFilled,
 } from "@ant-design/icons";
-import NewMeeting from "./NewMeeting";
+// import NewMeeting from "./NewMeeting";
+import RoomsContext from "../contexts/RoomsContext";
+import MainModal from "./Modal/MainModal";
+import { ModalProvider } from "../contexts/ModalContext";
 
 interface RightMenuProps {
   selectContent: (content: number) => void;
   userdata: {
     id: number;
   };
-  rooms: { key: string; label: string; icon: string }[];
 }
 
 const RightMenu: React.FC<RightMenuProps> = (props) => {
-  const { selectContent, userdata, rooms } = props;
+  const { selectContent, userdata } = props;
+  const { rooms } = useContext(RoomsContext);
   const [modalNM, setModalNM] = useState<boolean>(false);
 
   const menuHandler = (item: any) => {
@@ -53,11 +56,9 @@ const RightMenu: React.FC<RightMenuProps> = (props) => {
   return (
     <div style={{ width: 256, height: "100%", padding: "10% 2%" }}>
       {modalNM && (
-        <NewMeeting
-          closeModal={handleModalClose}
-          rooms={rooms}
-          userId={userdata.id}
-        />
+        <ModalProvider>
+          <MainModal create loading={false} closeModal={handleModalClose} />
+        </ModalProvider>
       )}
       {rooms && (
         <Flex align="center" vertical>

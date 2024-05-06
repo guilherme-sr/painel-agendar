@@ -58,7 +58,6 @@ const App: React.FC = () => {
         },
         populate: ["room", "creator"],
       });
-      console.log("🚀 ~ fetchMonthMeetings ~ query:", query);
       const response = await axios.get(
         `http://192.168.1.125:1337/api/Meetings?${query}`,
 
@@ -98,7 +97,7 @@ const App: React.FC = () => {
           {listData.map((item: any) => (
             <p onClick={() => handleMeetingClick(item)}>
               <Badge
-                key={item.attributes.room.data?.attributes.color}
+                key={item.attributes.room.data?.attributes.createdAt}
                 color={item.attributes.room.data?.attributes.color}
                 text={item.attributes.name}
                 className="calendar-meeting"

@@ -1,66 +1,36 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import {
-  Button,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  Select,
-  Tag,
-  message,
-  Flex,
-} from "antd";
-import dayjs from "dayjs";
-
-const dateFormat = "DD-MM-YYYY";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Modal } from "antd";
+import { ModalContext, ModalProvider } from "../../contexts/ModalContext";
+import CreateMeeting from "./CreateMeeting";
+import EditMeeting from "./EditMeeting";
 
 interface ModalProps {
-  rooms: { key: string; label: string; icon: string }[];
   closeModal: () => void;
-  userId?: number;
-  modalTitle: string;
-  editName: string;
-  editDescription: string;
-  editStart: string;
-  editEnd: string;
-  editRoom: string;
+  loading: boolean;
+  create?: boolean;
+  edit?: boolean;
+  view?: boolean;
 }
 
 const NewMeeting: React.FC<ModalProps> = (props) => {
-  const {
-    rooms,
-    closeModal,
-    userId,
-    modalTitle,
-    editName,
-    editDescription,
-    editEnd,
-    editStart,
-    editRoom,
-  } = props;
+  const { closeModal, loading, create, edit, view } = props;
+  const { modalTitle, changeModalTitle } = useContext(ModalContext);
+
+  useEffect(() => {
+    if (create) {
+      changeModalTitle("Novo agendamento");
+    } else if (edit) {
+      changeModalTitle("Editar agendamento");
+    } else if (view) {
+      changeModalTitle("Visualizar agendamento");
+    }
+  }, []);
 
   return (
-    <Modal
-      title={modalTitle}
-      open={true}
-      onOk={handleSubmit}
-      onCancel={closeModal}
-      width={450}
-      footer={[
-        <Button disabled={loading} key="back" onClick={closeModal}>
-          Cancelar
-        </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={handleSubmit}
-        >
-          Salvar
-        </Button>,
-      ]}
-    ></Modal>
+    <Modal title={modalTitle} onCancel={closeModal} width={450} open>
+      {create && <CreateMeeting closeModal={closeModal} />}
+      {edit && <EditMeeting closeModal={closeModal} />}
+    </Modal>
   );
 };
 
