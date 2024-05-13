@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Modal } from "antd";
-import { ModalContext, ModalProvider } from "../../contexts/ModalContext";
+import { Modal } from "antd";
+import { ModalContext } from "../../contexts/ModalContext";
 import CreateMeeting from "./CreateMeeting";
 import EditMeeting from "./EditMeeting";
 
@@ -13,7 +13,7 @@ interface ModalProps {
 }
 
 const NewMeeting: React.FC<ModalProps> = (props) => {
-  const { closeModal, loading, create, edit, view } = props;
+  const { closeModal, create, edit, view } = props;
   const { modalTitle, changeModalTitle } = useContext(ModalContext);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
   }, []);
 
   return (
-    <Modal title={modalTitle} onCancel={closeModal} width={450} open>
+    <Modal title={modalTitle} onCancel={closeModal} width={450} open footer>
       {create && <CreateMeeting closeModal={closeModal} />}
       {edit && <EditMeeting closeModal={closeModal} />}
     </Modal>

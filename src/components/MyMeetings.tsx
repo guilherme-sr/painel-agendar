@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import RoomsContext from "../contexts/RoomsContext";
 import { ModalProvider } from "../contexts/ModalContext";
 import MainModal from "./Modal/MainModal";
+import qs from "qs";
 
 interface MyMeetingsIfc {
   userId: string;
@@ -52,8 +53,24 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
   };
 
   const getMeetings: any = async () => {
+    const query = qs.stringify({
+      filters: {
+        $and: [
+          { creator: [userId] },
+          {
+            start: {
+              $gt:
+                dayjs(Date.now()).format("YYYY-MM-DDTHH:mm:ss").toString() +
+                ".000Z",
+            },
+          },
+        ],
+      },
+      populate: "room",
+    });
+    console.log("🚀 ~ constgetMeetings:any= ~ query:", query);
     const response = await axios.get(
-      `http://192.168.1.125:1337/api/Meetings?filters[creator]=${userId}&populate=room`,
+      `http://192.168.1.125:1337/api/Meetings?${query}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -134,7 +151,10 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
                 </p>
               </Flex>
               <p>
-                <b>Data</b>: {meetingItem.attributes.start}
+                <b>Data</b>:{" "}
+                {dayjs(meetingItem.attributes.start)
+                  .format("DD/MM/YYYY")
+                  .toString()}
               </p>
               <p>
                 <b>Hora de início</b>:{" "}

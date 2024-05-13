@@ -13,8 +13,6 @@ import {
 import dayjs from "dayjs";
 import { XFilled } from "@ant-design/icons";
 import RoomsContext from "../../contexts/RoomsContext";
-import { ModalContext } from "../../contexts/ModalContext";
-import { log } from "console";
 
 const dateFormat = "DD-MM-YYYY";
 
@@ -28,32 +26,13 @@ interface userDataInterface {
 
 const CreateMeeting: React.FC<ModalProps> = (props) => {
   const { closeModal } = props;
-
   const { rooms } = useContext(RoomsContext);
-  // const { changeModalTitle } = useContext(ModalContext);
 
-  const [meeting, setMeeting] = useState({
-    name: "",
-    description: "",
-    start: "",
-    end: "",
-    room: "",
-    creator: 0,
-  });
-  const [endMinutes, setEndMinutes] = useState<number>(15);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [participants, setParticipants] = useState<string[]>([]);
   const [currentEmail, setCurrentEmail] = useState("");
-
-  const [createName, setCreateName] = useState("");
-  const [createDescription, setCreateDescription] = useState("");
-  const [createDate, setCreateDate] = useState(dayjs().toString());
-  const [createDuration, setCreateDuration] = useState("");
-  const [createParticipants, setCreateParticipants] = useState("");
-  const [selectedRoom, setSelectedRoom] = useState<number | null>(null);
-
   const [userData, setUserData] = useState<userDataInterface>({ id: 0 });
 
   useEffect(() => {
@@ -99,13 +78,18 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
 
   const handleKeyDown = (e: any) => {
     if (e.key === "Enter" && isValidEmail(currentEmail)) {
-      if (!participants.includes(currentEmail)) {
-        setParticipants([...participants, currentEmail]);
-        setCurrentEmail("");
-      } else {
-        setCurrentEmail("");
-      }
+      addParticipant();
     }
+  };
+
+  const addParticipant = () => {
+    if (!participants.includes(currentEmail)) {
+      setParticipants([...participants, currentEmail]);
+      setCurrentEmail("");
+    } else {
+      setCurrentEmail("");
+    }
+    console.log(participants);
   };
 
   const isValidEmail = (email: string) => {
@@ -118,38 +102,33 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
     setParticipants(participants.filter((pt) => pt !== notParticipant));
   };
 
-  const getRoomId = (roomKey: string) => {
-    const reId = /\d.*$/;
-    return reId.exec(roomKey);
+  const formatDate = (date: string) => {
+    return dayjs(date).format("YYYY-MM-DD HH:mm:ss").toString();
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    console.log(meeting);
+  const getEndDate = (date: string, duration: number) => {
+    return formatDate(dayjs(date).add(duration, "minute").toString());
+  };
+
+  const handleSubmit = async () => {
+    var values = form.getFieldsValue(true);
     setLoading(true);
     setError(false);
     setSuccess(false);
     const final_meeting = {
-      ...meeting,
+      name: values.name,
+      description: values.description,
+      start: formatDate(values.startDate),
+      room: values.room,
       creator: userData.id,
-      end: dayjs(dayjs(meeting.start).add(endMinutes, "minute"))
-        .format("YYYY-MM-DD HH:mm:ss")
-        .toString(),
-      room: getRoomId(meeting.room),
+      end: getEndDate(values.startDate, values.duration),
     };
     console.log(final_meeting);
     try {
       const response = await axios.post(
         "http://192.168.1.125:1337/api/meetings",
         {
-          data: {
-            name: createName,
-            description: createDescription,
-            start: createDate,
-            room: selectedRoom,
-            creator: userData.id,
-            end: dayjs(dayjs(createDate).add(endMinutes, "minute")),
-          },
+          data: final_meeting,
         },
         {
           headers: {
@@ -158,15 +137,28 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
         }
       );
       console.log(response);
-
-      setMeeting({
-        name: "",
-        description: "",
-        start: "",
-        end: "",
-        room: "",
-        creator: 0,
-      });
+      if (participants.length > 0) {
+        try {
+          participants.forEach(async (participant) => {
+            const responseParticipants = await axios.post(
+              "http://192.168.1.125:1337/api/participants",
+              {
+                data: {
+                  meeting: response.data.data.id,
+                  email: participant,
+                  confirmed: false,
+                },
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+            console.log(responseParticipants);
+          });
+        } catch (error) {}
+      }
       setLoading(false);
       setSuccess(true);
     } catch (error) {
@@ -175,10 +167,7 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
     }
   };
 
-  const handleSelectChange = (value: number) => {
-    console.log(`selected ${value}`);
-    setSelectedRoom(value);
-  };
+  const [form] = Form.useForm();
 
   return (
     <>
@@ -186,18 +175,25 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
         initialValues={{ remember: true }}
         layout="vertical"
         className="form-modal"
+        form={form}
+        onFinish={handleSubmit}
       >
         <Form.Item
+          name="name"
           label="Nome"
-          rules={[{ required: true, message: "Insira o nome do agendamento!" }]}
+          rules={[
+            {
+              required: true,
+              message: "Insira o nome do agendamento!",
+              warningOnly: false,
+            },
+          ]}
         >
-          <Input
-            value={createName}
-            onChange={(e) => setCreateName(e.target.value)}
-          />
+          <Input />
         </Form.Item>
         <Flex gap="large">
           <Form.Item
+            name="startDate"
             label="Início"
             rules={[
               {
@@ -206,27 +202,17 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
               },
             ]}
           >
-            <DatePicker
-              showTime
-              minDate={dayjs(dayjs(), dateFormat)}
-              value={dayjs(createDate)}
-              onChange={(_, dateString) => {
-                setCreateDate(dateString.toString());
-              }}
-            />
+            <DatePicker showTime minDate={dayjs(dayjs(), dateFormat)} />
           </Form.Item>
           <Form.Item
+            name="duration"
             label="Duração"
+            style={{ minWidth: "80px" }}
             rules={[
               { required: true, message: "Selecione o tempo de duração!" },
             ]}
           >
             <Select
-              value={endMinutes}
-              defaultValue={endMinutes}
-              onChange={(value) => {
-                setEndMinutes(value);
-              }}
               options={[
                 { value: 15, label: <span>15 min.</span> },
                 { value: 30, label: <span>30 min.</span> },
@@ -237,13 +223,12 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
           </Form.Item>
         </Flex>
         <Form.Item
+          name="room"
           label="Sala"
           rules={[{ required: true, message: "Selecione a sala!" }]}
         >
           {rooms && (
             <Select
-              value={selectedRoom}
-              onChange={handleSelectChange}
               options={rooms.map((room) => {
                 return {
                   value: room.id,
@@ -261,18 +246,19 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
           )}
         </Form.Item>
         <Form.Item label="Descrição" name="description">
-          <Input.TextArea
-            value={createDescription}
-            onChange={(e) => setCreateDescription(e.target.value)}
-            autoSize={{ minRows: 2, maxRows: 6 }}
-          />
+          <Input.TextArea autoSize={{ minRows: 2, maxRows: 6 }} />
         </Form.Item>
         <Form.Item label="Participantes" name="participants">
-          <Input
-            value={currentEmail}
-            onChange={(e) => setCurrentEmail(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
+          <Flex>
+            <Input
+              type="email"
+              value={currentEmail}
+              onChange={(e) => {
+                setCurrentEmail(e.target.value);
+              }}
+            />
+            <Button onClick={addParticipant}>+</Button>
+          </Flex>
         </Form.Item>
         <Form.Item>
           <div style={{ marginTop: 10 }}>
@@ -287,6 +273,18 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
             ))}
           </div>
         </Form.Item>
+        <Flex justify={"flex-end"} align={"center"} gap={"small"}>
+          <Form.Item>
+            <Button disabled={loading} onClick={closeModal}>
+              Cancelar
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button disabled={loading} type="primary" htmlType="submit">
+              Criar
+            </Button>
+          </Form.Item>
+        </Flex>
       </Form>
     </>
   );
