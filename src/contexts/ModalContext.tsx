@@ -4,15 +4,19 @@ export type ModalProps = {
   modalTitle: string;
   changeModalTitle: (newtitle: string) => void;
   name?: string;
-  changeMeetingName?: (newname: string) => void;
+  changeMeetingName: (newname: string) => void;
   description?: string;
-  changeMeetingDescription?: (newdescription: string) => void;
+  changeMeetingDescription: (newdescription: string) => void;
   start?: string;
-  changeMeetingStart?: (newstart: string) => void;
-  duration?: string;
-  changeMeetingDuration?: (newduration: string) => void;
-  room?: string;
-  changeMeetingRoom?: (newroom: string) => void;
+  changeMeetingStart: (newstart: string) => void;
+  end: string;
+  changeMeetingEnd: (newduration: string) => void;
+  roomName: string;
+  changeMeetingRoomName: (newroom: string) => void;
+  roomColor: string;
+  changeMeetingRoomColor: (newroom: string) => void;
+  viewId: number;
+  changeViewId: (newView: number) => void;
 };
 
 const ModalContext = createContext<ModalProps>({} as ModalProps);
@@ -21,8 +25,10 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
   const [meetingName, setMeetingName] = useState<string>("");
   const [meetingDescription, setMeetingDescription] = useState<string>("");
   const [meetingStart, setMeetingStart] = useState<string>("");
-  const [meetingDuration, setMeetingDuration] = useState<string>("");
-  const [meetingRoom, setMeetingRoom] = useState<string>("");
+  const [meetingEnd, setMeetingEnd] = useState<string>("");
+  const [meetingRoomColor, setMeetingRoomColor] = useState<string>("");
+  const [meetingRoomName, setMeetingRoomName] = useState<string>("");
+  const [viewId, setViewId] = useState<number>(0);
 
   function changeModalTitle(newtitle: string) {
     setModalTitle(newtitle);
@@ -40,12 +46,21 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
     setMeetingStart(newstart);
   }
 
-  function changeMeetingDuration(newduration: string) {
-    setMeetingDuration(newduration);
+  function changeMeetingEnd(newduration: string) {
+    setMeetingEnd(newduration);
   }
 
-  function changeMeetingRoom(newroom: string) {
-    setMeetingRoom(newroom);
+  function changeMeetingRoomColor(newroom: string) {
+    setMeetingRoomColor(newroom);
+  }
+
+  function changeMeetingRoomName(newroom: string) {
+    setMeetingRoomName(newroom);
+  }
+
+  function changeViewId(newView: number) {
+    console.log("🚀 ~ changeViewId ~ newView:", newView);
+    setViewId(newView);
   }
 
   return (
@@ -59,10 +74,14 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
         changeMeetingDescription,
         start: meetingStart,
         changeMeetingStart,
-        duration: meetingDuration,
-        changeMeetingDuration,
-        room: meetingRoom,
-        changeMeetingRoom,
+        end: meetingEnd,
+        changeMeetingEnd,
+        roomName: meetingRoomName,
+        changeMeetingRoomName,
+        roomColor: meetingRoomColor,
+        changeMeetingRoomColor,
+        viewId,
+        changeViewId,
       }}
     >
       {children}

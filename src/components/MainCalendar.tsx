@@ -4,6 +4,8 @@ import type { CalendarProps } from "antd";
 import { Calendar, Badge } from "antd";
 import axios from "axios";
 import qs from "qs";
+import { ModalProvider } from "../contexts/ModalContext";
+import MainModal from "./Modal/MainModal";
 
 interface DaysOfMonth {
   [key: number]: any[];
@@ -20,6 +22,8 @@ const App: React.FC = () => {
   const dataAtual = dayjs(); // Obter a data atual
   const [mes, setMes] = useState(dataAtual.month() + 1);
   const [ano, setAno] = useState(dataAtual.year());
+  const [modalNM, setModalNM] = useState<boolean>(false);
+  const [viewId, setViewId] = useState<number>(0);
 
   useEffect(() => {
     if (monthEvents) {
@@ -85,7 +89,9 @@ const App: React.FC = () => {
   };
 
   const handleMeetingClick = (event: any) => {
-    console.log("🚀 ~ handleMeetingClick ~ event:", event);
+    console.log("🚀 ~ handleMeetingClick ~ event:", event.id);
+    setViewId(event.id);
+    setModalNM(true);
   };
 
   const dateCellRender = (value: Dayjs) => {
@@ -114,10 +120,23 @@ const App: React.FC = () => {
     if (info.type === "month") return null;
   };
 
+  const handleModalClose = () => {
+    setModalNM(false);
+  };
+
   return (
     <>
       {!loading && (
         <Calendar onChange={calendarChange} cellRender={cellRender} />
+      )}
+      {modalNM && (
+        <ModalProvider>
+          <MainModal
+            view={viewId}
+            loading={false}
+            closeModal={handleModalClose}
+          />
+        </ModalProvider>
       )}
     </>
   );

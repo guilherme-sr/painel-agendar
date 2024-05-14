@@ -1,20 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { Modal } from "antd";
 import { ModalContext } from "../../contexts/ModalContext";
 import CreateMeeting from "./CreateMeeting";
 import EditMeeting from "./EditMeeting";
+import ViewMeeting from "./ViewMeeting";
 
 interface ModalProps {
   closeModal: () => void;
   loading: boolean;
   create?: boolean;
   edit?: boolean;
-  view?: boolean;
+  view?: number;
 }
 
 const NewMeeting: React.FC<ModalProps> = (props) => {
   const { closeModal, create, edit, view } = props;
-  const { modalTitle, changeModalTitle } = useContext(ModalContext);
+  const { modalTitle, changeModalTitle, changeViewId } =
+    useContext(ModalContext);
 
   useEffect(() => {
     if (create) {
@@ -22,7 +24,9 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
     } else if (edit) {
       changeModalTitle("Editar agendamento");
     } else if (view) {
+      console.log("🚀 ~ useEffect ~ view:", view);
       changeModalTitle("Visualizar agendamento");
+      changeViewId(view);
     }
   }, []);
 
@@ -30,6 +34,7 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
     <Modal title={modalTitle} onCancel={closeModal} width={450} open footer>
       {create && <CreateMeeting closeModal={closeModal} />}
       {edit && <EditMeeting closeModal={closeModal} />}
+      {view && <ViewMeeting closeModal={closeModal} />}
     </Modal>
   );
 };
