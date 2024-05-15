@@ -8,6 +8,7 @@ import MyMeetings from "../../components/MyMeetings";
 import axios from "axios";
 import RoomsContext from "../../contexts/RoomsContext";
 import { ModalContext } from "../../contexts/ModalContext";
+import Configurations from "../../components/Configurations";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -102,7 +103,7 @@ const Home: React.FC = () => {
 
             <Content style={{ padding: "10px 80px 80px 80px", minHeight: 280 }}>
               {content == 1 && <MyMeetings userId={"1"} />}
-              {content == 2 && <div>Configurações</div>}
+              {content == 2 && <Configurations />}
               {content == 3 && <MainCalendar />}
             </Content>
           </Layout>

@@ -3,7 +3,6 @@ import { List, Card, Flex, Divider, Skeleton } from "antd";
 import axios from "axios";
 import { XFilled, EditOutlined } from "@ant-design/icons";
 import SkeletonCards from "./SkeletonCards";
-import ModalMeeting from "./ModalMeeting";
 import dayjs from "dayjs";
 import RoomsContext from "../contexts/RoomsContext";
 import { ModalProvider } from "../contexts/ModalContext";

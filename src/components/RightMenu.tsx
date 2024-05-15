@@ -34,7 +34,6 @@ const RightMenu: React.FC<RightMenuProps> = (props) => {
       case "calendar":
         selectContent(3);
         break;
-      case "new":
       case "settings":
         selectContent(2);
         break;

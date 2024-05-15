@@ -12,3 +12,20 @@ content-type: application/json
 
 http://192.168.1.125:1337/api/Users/me
 Authorization: Bearer {{token}}
+
+###
+
+http://192.168.1.125:1337/api/Users?populate=role
+Authorization: Bearer {{token}}
+
+###
+POST http://192.168.1.125:1337/api/Users
+Authorization: Bearer {{token}}
+content-type: application/json
+
+{
+    "username": "teste",
+    "email": "aaa@aaa.com",
+    "password": "adasdasdasdasdas",
+    "role": 2
+}
