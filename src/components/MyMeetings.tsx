@@ -42,11 +42,7 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
   const [meetings, setMeetings] = useState<MeetingsIfc[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [editName, setEditName] = useState("");
-  const [editStart, setEditStart] = useState("");
-  const [editEnd, setEditEnd] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [editRoom, setEditRoom] = useState("");
+  const [editId, setEditId] = useState(0);
 
   const handleModalClose = () => {
     setModalVisible(false);
@@ -82,15 +78,7 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
   };
 
   const handleEdit: any = (target: any) => {
-    console.log("start " + target.attributes.start);
-    console.log(dayjs("2024-04-03T01:00:00.000", "YYYY-MM-DDTHH:mm:ss"));
-
-    console.log(target);
-    setEditName(target.attributes.name);
-    setEditStart(target.attributes.start);
-    setEditEnd(target.attributes.end);
-    setEditDescription(target.attributes.description);
-    setEditRoom(target.attributes.room.data.attributes.name);
+    setEditId(target.id);
     setModalVisible(true);
   };
 
@@ -112,7 +100,11 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
         //   editRoom={editRoom}
         // />
         <ModalProvider>
-          <MainModal edit loading={false} closeModal={handleModalClose} />
+          <MainModal
+            edit={editId}
+            loading={false}
+            closeModal={handleModalClose}
+          />
         </ModalProvider>
       )}
       <Divider />

@@ -3,22 +3,14 @@ import axios from "axios";
 import { Flex, Skeleton, Tag } from "antd";
 import dayjs from "dayjs";
 import { XFilled } from "@ant-design/icons";
-import RoomsContext from "../../contexts/RoomsContext";
 import { ModalContext } from "../../contexts/ModalContext";
 import qs from "qs";
-
-const dateFormat = "DD-MM-YYYY";
 
 interface ModalProps {
   closeModal: () => void;
 }
 
-interface userDataInterface {
-  id: number;
-}
-
-const ViewMeeting: React.FC<ModalProps> = (props) => {
-  const { closeModal } = props;
+const ViewMeeting: React.FC<ModalProps> = () => {
   const {
     name,
     changeMeetingName,
@@ -36,7 +28,6 @@ const ViewMeeting: React.FC<ModalProps> = (props) => {
   } = useContext(ModalContext);
 
   const [participants, setParticipants] = useState<string[]>([]);
-  const [userData, setUserData] = useState<userDataInterface>({ id: 0 });
   const [loading, setLoading] = useState(true);
 
   const populateMeetingView = (meeting: {
@@ -72,6 +63,7 @@ const ViewMeeting: React.FC<ModalProps> = (props) => {
       } catch (error) {
         console.error("Erro ao recuperar os dados da reunião:", error);
       }
+      fetchParticipants();
     };
     const fetchParticipants = async () => {
       const query = qs.stringify({
@@ -88,7 +80,6 @@ const ViewMeeting: React.FC<ModalProps> = (props) => {
             },
           }
         );
-        console.log(response.data.data);
         setParticipants(response.data.data);
         setLoading(false);
       } catch (error) {
@@ -96,7 +87,6 @@ const ViewMeeting: React.FC<ModalProps> = (props) => {
       }
     };
     fetchMeetingData();
-    fetchParticipants();
   }, [viewId]);
 
   const formatDate = (date: string) => {

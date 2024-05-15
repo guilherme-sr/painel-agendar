@@ -17,6 +17,8 @@ export type ModalProps = {
   changeMeetingRoomColor: (newroom: string) => void;
   viewId: number;
   changeViewId: (newView: number) => void;
+  editId: number;
+  changeEditId: (newView: number) => void;
 };
 
 const ModalContext = createContext<ModalProps>({} as ModalProps);
@@ -29,6 +31,7 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
   const [meetingRoomColor, setMeetingRoomColor] = useState<string>("");
   const [meetingRoomName, setMeetingRoomName] = useState<string>("");
   const [viewId, setViewId] = useState<number>(0);
+  const [editId, setEditId] = useState<number>(0);
 
   function changeModalTitle(newtitle: string) {
     setModalTitle(newtitle);
@@ -59,8 +62,11 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
   }
 
   function changeViewId(newView: number) {
-    console.log("🚀 ~ changeViewId ~ newView:", newView);
     setViewId(newView);
+  }
+
+  function changeEditId(newView: number) {
+    setEditId(newView);
   }
 
   return (
@@ -82,6 +88,8 @@ function ModalProvider({ children }: { children: React.ReactNode }) {
         changeMeetingRoomColor,
         viewId,
         changeViewId,
+        editId,
+        changeEditId,
       }}
     >
       {children}

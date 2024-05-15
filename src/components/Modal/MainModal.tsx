@@ -9,13 +9,13 @@ interface ModalProps {
   closeModal: () => void;
   loading: boolean;
   create?: boolean;
-  edit?: boolean;
+  edit?: number;
   view?: number;
 }
 
 const NewMeeting: React.FC<ModalProps> = (props) => {
   const { closeModal, create, edit, view } = props;
-  const { modalTitle, changeModalTitle, changeViewId } =
+  const { modalTitle, changeModalTitle, changeViewId, changeEditId } =
     useContext(ModalContext);
 
   useEffect(() => {
@@ -23,8 +23,8 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
       changeModalTitle("Novo agendamento");
     } else if (edit) {
       changeModalTitle("Editar agendamento");
+      changeEditId(edit);
     } else if (view) {
-      console.log("🚀 ~ useEffect ~ view:", view);
       changeModalTitle("Visualizar agendamento");
       changeViewId(view);
     }
