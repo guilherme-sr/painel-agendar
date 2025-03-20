@@ -44,7 +44,7 @@ const Configurations = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.get("http://192.168.1.125:1337/api/Users", {
+      const response = await axios.get("http://localhost:1337/api/Users", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -67,7 +67,7 @@ const Configurations = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.get("http://192.168.1.125:1337/api/Rooms", {
+      const response = await axios.get("http://localhost:1337/api/Rooms", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -82,7 +82,7 @@ const Configurations = () => {
 
   const handleDeleteUser = async (id: number) => {
     try {
-      await axios.delete(`http://192.168.1.125:1337/api/Users/${id}`, {
+      await axios.delete(`http://localhost:1337/api/Users/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -108,7 +108,7 @@ const Configurations = () => {
     const values = formUser.getFieldsValue(true);
     try {
       axios.post(
-        "http://192.168.1.125:1337/api/Users",
+        "http://localhost:1337/api/Users",
         { ...values, role: 2 },
         {
           headers: {
@@ -140,7 +140,7 @@ const Configurations = () => {
     const values = formRoom.getFieldsValue(true);
     try {
       axios.post(
-        "http://192.168.1.125:1337/api/Rooms",
+        "http://localhost:1337/api/Rooms",
         { data: { ...values } },
         {
           headers: {
@@ -160,7 +160,7 @@ const Configurations = () => {
 
   const handleDeleteRoom = async (id: number) => {
     try {
-      await axios.delete(`http://192.168.1.125:1337/api/Rooms/${id}`, {
+      await axios.delete(`http://localhost:1337/api/Rooms/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

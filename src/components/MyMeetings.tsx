@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { List, Card, Flex, Divider, Skeleton } from "antd";
+import { List, Card, Flex, Divider } from "antd";
 import axios from "axios";
 import { XFilled, EditOutlined } from "@ant-design/icons";
 import SkeletonCards from "./SkeletonCards";
@@ -45,9 +45,11 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
 
   const handleModalClose = () => {
     setModalVisible(false);
+    getMeetings();
   };
 
   const getMeetings: any = async () => {
+    setLoading(true);
     const query = qs.stringify({
       filters: {
         $and: [
@@ -63,9 +65,8 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
       },
       populate: "room",
     });
-    console.log("🚀 ~ constgetMeetings:any= ~ query:", query);
     const response = await axios.get(
-      `http://192.168.1.125:1337/api/Meetings?${query}`,
+      `http://localhost:1337/api/Meetings?${query}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -89,15 +90,6 @@ const MyMeetings: React.FC<MyMeetingsIfc> = (props) => {
     <Flex vertical>
       <span className="title">Meus Agendamentos</span>
       {modalVisible && (
-        // <ModalMeeting
-        //   closeModal={hideModal}
-        //   modalTitle={"Meu Agendamento"}
-        //   editName={editName}
-        //   editStart={editStart}
-        //   editEnd={editEnd}
-        //   editDescription={editDescription}
-        //   editRoom={editRoom}
-        // />
         <ModalProvider>
           <MainModal
             edit={editId}

@@ -1,5 +1,5 @@
 
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE0MjU4Mjg4LCJleHAiOjE3MTY4NTAyODh9.dOokTc9B79DdOUkK7Ne5DL85A-JOl9Cc3LXqR_3nlVc
 
-http://192.168.1.125:1337/api/Rooms
+http://localhost:1337/api/Rooms
 Authorization: Bearer {{token}}

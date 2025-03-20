@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Space, Form, Input, Button } from "antd";
+import { Flex, Space, Form, Input, Button, Layout, Image } from "antd";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
+
+const { Header } = Layout;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://192.168.1.125:1337/api/auth/local",
+        "http://localhost:1337/api/auth/local",
         {
           identifier: values.username,
           password: values.password,
@@ -49,52 +51,64 @@ const Login: React.FC = () => {
   };
 
   return (
-    <Flex gap="middle" align="center" vertical>
-      <Space>
-        <div className="login-container">
-          <h2>Login</h2>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Header
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "60px",
+        }}
+      >
+        <Image width={180} src="/AgendarTopLogo.png" preview={false} />
+      </Header>
+      <Flex gap="middle" align="center" vertical>
+        <Space>
+          <div className="login-container">
+            <h2>Login</h2>
 
-          <Form
-            name="basic"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            layout="vertical"
-            className="form-login"
-          >
-            <Form.Item
-              label="E-mail"
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  message: "Insira seu usuário!",
-                  type: "email",
-                },
-              ]}
+            <Form
+              name="basic"
+              initialValues={{ remember: true }}
+              onFinish={onFinish}
+              layout="vertical"
+              className="form-login"
             >
-              <Input />
-            </Form.Item>
+              <Form.Item
+                label="E-mail"
+                name="username"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira seu usuário!",
+                    type: "email",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
 
-            <Form.Item
-              label="Senha"
-              name="password"
-              rules={[{ required: true, message: "Insira sua senha!" }]}
-            >
-              <Input.Password />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                Login
-              </Button>
-            </Form.Item>
+              <Form.Item
+                label="Senha"
+                name="password"
+                rules={[{ required: true, message: "Insira sua senha!" }]}
+              >
+                <Input.Password />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Login
+                </Button>
+              </Form.Item>
 
-            <Form.Item>
-              {error && <div className="login-error">{error}</div>}
-            </Form.Item>
-          </Form>
-        </div>
-      </Space>
-    </Flex>
+              <Form.Item>
+                {error && <div className="login-error">{error}</div>}
+              </Form.Item>
+            </Form>
+          </div>
+        </Space>
+      </Flex>
+    </Layout>
   );
 };
 

@@ -1,25 +1,25 @@
-POST http://192.168.1.125:1337/api/auth/local HTTP/1.1
+POST http://localhost:1337/api/auth/local HTTP/1.1
 content-type: application/json
 
 {
-    "identifier": "guilherme.ribeiro@refrix.com.br",
-    "password": "A952f25162784b55f739793259c4f2c"
+    "identifier": "email@email.com",
+    "password": "pass_A952f25162784b55f739793259c4f2c"
 }
 
 
 ###
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE0MjU4Mjg4LCJleHAiOjE3MTY4NTAyODh9.dOokTc9B79DdOUkK7Ne5DL85A-JOl9Cc3LXqR_3nlVc
 
-http://192.168.1.125:1337/api/Users/me
+http://localhost:1337/api/Users/me
 Authorization: Bearer {{token}}
 
 ###
 
-http://192.168.1.125:1337/api/Users?populate=role
+http://localhost:1337/api/Users?populate=role
 Authorization: Bearer {{token}}
 
 ###
-POST http://192.168.1.125:1337/api/Users
+POST http://localhost:1337/api/Users
 Authorization: Bearer {{token}}
 content-type: application/json
 

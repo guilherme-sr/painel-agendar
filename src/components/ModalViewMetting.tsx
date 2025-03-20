@@ -154,7 +154,7 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
     console.log(final_meeting);
     try {
       const response = await axios.post(
-        "http://192.168.1.125:1337/api/meetings",
+        "http://localhost:1337/api/meetings",
         {
           data: {
             name: mName,

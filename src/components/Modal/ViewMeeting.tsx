@@ -52,7 +52,7 @@ const ViewMeeting: React.FC<ModalProps> = () => {
       try {
         console.log("🚀 ~ fetchMeetingData ~ viewId:", viewId);
         const response = await axios.get(
-          `http://192.168.1.125:1337/api/Meetings/${viewId}?${query}`,
+          `http://localhost:1337/api/Meetings/${viewId}?${query}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -73,7 +73,7 @@ const ViewMeeting: React.FC<ModalProps> = () => {
       });
       try {
         const response = await axios.get(
-          "http://192.168.1.125:1337/api/Participants?" + query,
+          "http://localhost:1337/api/Participants?" + query,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

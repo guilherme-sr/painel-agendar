@@ -14,19 +14,17 @@ import { ModalProvider } from "../contexts/ModalContext";
 
 interface RightMenuProps {
   selectContent: (content: number) => void;
-  userdata: {
-    id: number;
-  };
 }
 
 const RightMenu: React.FC<RightMenuProps> = (props) => {
-  const { selectContent, userdata } = props;
+  const { selectContent } = props;
   const { rooms } = useContext(RoomsContext);
   const [modalNM, setModalNM] = useState<boolean>(false);
+  const [selectMenu, setSelectMenu] = useState<string>("meetings");
 
   const menuHandler = (item: any) => {
-    console.log(item.key);
-
+    selectContent(0);
+    setSelectMenu(item.key);
     switch (item.key) {
       case "meetings":
         selectContent(1);
@@ -49,7 +47,9 @@ const RightMenu: React.FC<RightMenuProps> = (props) => {
   };
 
   const handleModalClose = () => {
+    console.log("Fechou Modal");
     setModalNM(false);
+    // menuHandler({ key: selectMenu });
   };
 
   return (
@@ -67,7 +67,7 @@ const RightMenu: React.FC<RightMenuProps> = (props) => {
           <Divider />
           <Menu
             className="right-menu"
-            defaultSelectedKeys={["new"]}
+            defaultSelectedKeys={["calendar"]}
             onClick={menuHandler}
             mode="inline"
             theme="light"
@@ -81,7 +81,6 @@ const RightMenu: React.FC<RightMenuProps> = (props) => {
                 label: <div id="btn-calendar">Calendário</div>,
                 key: "calendar",
                 icon: <CalendarOutlined />,
-                // children: rooms,
               },
               {
                 label: <div id="btn-settings">Configurações</div>,

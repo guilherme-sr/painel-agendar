@@ -38,14 +38,11 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(
-          "http://192.168.1.125:1337/api/Users/me",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:1337/api/Users/me", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setUserData(response.data);
       } catch (error) {
         console.error("Erro ao recuperar os dados do usuário:", error);
@@ -126,7 +123,7 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
     console.log(final_meeting);
     try {
       const response = await axios.post(
-        "http://192.168.1.125:1337/api/meetings",
+        "http://localhost:1337/api/meetings",
         {
           data: final_meeting,
         },
@@ -141,7 +138,7 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
         try {
           participants.forEach(async (participant) => {
             const responseParticipants = await axios.post(
-              "http://192.168.1.125:1337/api/participants",
+              "http://localhost:1337/api/participants",
               {
                 data: {
                   meeting: response.data.data.id,

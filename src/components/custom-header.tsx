@@ -72,14 +72,11 @@ const CustomHeader: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://192.168.1.125:1337/api/Users/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:1337/api/Users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setUserData(response.data);
       } catch (error) {
         console.error("Erro ao recuperar os dados do usuário:", error);

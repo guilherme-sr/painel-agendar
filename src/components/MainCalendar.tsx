@@ -63,7 +63,7 @@ const App: React.FC = () => {
         populate: ["room", "creator"],
       });
       const response = await axios.get(
-        `http://192.168.1.125:1337/api/Meetings?${query}`,
+        `http://localhost:1337/api/Meetings?${query}`,
 
         {
           headers: {
