@@ -32,7 +32,7 @@ body {
 /* Estilos que usam as variáveis */
 /* ... seus outros estilos ... */
 
-Botão tema-escuro #dark{
+#Botao tema-escuro #dark{
   background-color: #333;
   border: #f9f9f9;
   border-radius: 200px;

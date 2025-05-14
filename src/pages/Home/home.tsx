@@ -91,11 +91,14 @@ const Home: React.FC = () => {
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
           height: "60px",
+          "padding": "0 20px 0 850px",
         }}
       >
+        
         <Image width={180} src="/AgendarTopLogo.png" preview={false} />
+        <Button id="Botao" onClick={toggleTheme}>{buttonText}</Button>{/* Adicionei o botão aqui */}
       </Header>
       <div className="home">
         {logged && (
