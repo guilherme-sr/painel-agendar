@@ -11,3 +11,26 @@
 body {
   background-color: var(--lt-color-background-default);
 }
+
+Botão tema-escuro #dark{
+  background-color: #333;
+  border: #f9f9f9;
+  border-radius: 200px;
+  left: 40%;
+} 
+
+#dark{
+  background-color: #333;
+  border: #f9f9f9;
+  border-radius: 200px;
+  left: 40%;
+}
+
+/* Tema Dark */
+.dark-theme {
+  --background-color: #1e1e1e;
+  --text-color: #f0f0f0;
+  --primary-color: #64b5f6;
+  --secondary-color: #a7b1b8;
+  /* ... outras variáveis de cor ... */
+}

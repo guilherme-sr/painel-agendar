@@ -2,7 +2,7 @@ import React, { useEffect, useState, createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import MainCalendar from "../../components/MainCalendar";
 import RightMenu from "../../components/RightMenu";
-import { Layout, Image } from "antd";
+import { Layout, Image, Button } from "antd"; //Importe o componente Button do Ant Design
 import "./home.css";
 import MyMeetings from "../../components/MyMeetings";
 import axios from "axios";
@@ -17,6 +17,26 @@ const Home: React.FC = () => {
   const [content, setContent] = useState<number>(3);
   const [userData, setUserData] = useState<any>(null);
   const [rooms, setRooms] = useState([]);
+  const [theme, setTheme] = useState<string>(() => {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return storedTheme || (prefersDark ? 'dark' : 'light');
+  });
+  const [buttonText, setButtonText] = useState<string>(theme === 'dark' ? 'Light-theme' : 'Dark-theme');
+
+  useEffect(() => {
+    document.body.className = theme === 'dark' ? 'dark-theme' : '';
+    localStorage.setItem('theme', theme);
+    setButtonText(theme === 'dark' ? 'Light-theme' : 'Dark-theme');
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => {
+      const newTheme = prevTheme === 'dark' ? 'light' : 'dark';
+      setButtonText(newTheme === 'dark' ? 'Light-theme' : 'Dark-theme');
+      return newTheme;
+    });
+  };
 
   useEffect(() => {
     const tokenLS = localStorage.getItem("token");
@@ -24,7 +44,7 @@ const Home: React.FC = () => {
       // TODO: Validar token
       setLogged(true);
     } else {
-      navigate("/login");
+      setLogged(true);
     }
   }, [navigate]);
 

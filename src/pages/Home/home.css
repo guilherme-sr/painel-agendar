@@ -10,3 +10,154 @@
   border-radius: 10px;
   width: 80%;
 }
+
+
+
+
+:root {
+  /* Tema Light (padrão) */
+  --background-color: #f9f9f9;
+  --text-color: #333;
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  /* ... outras variáveis de cor ... */
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos que usam as variáveis */
+/* ... seus outros estilos ... */
+
+Botão tema-escuro #dark{
+  background-color: #333;
+  border: #f9f9f9;
+  border-radius: 200px;
+  left: 40%;
+} 
+
+#dark{
+  background-color: #333;
+  border: #f9f9f9;
+  border-radius: 200px;
+  left: 40%;
+}
+
+/* Tema Dark */
+.dark-theme {
+  --background-color: #1e1e1e;
+  --text-color: #f0f0f0;
+  --primary-color: #64b5f6;
+  --secondary-color: #a7b1b8;
+  /* ... outras variáveis de cor ... */
+}
+
+
+/* Estilos para o Sider (RightMenu container) no tema dark */
+.dark-theme .ant-layout-sider {
+  background-color: #282828 !important;
+  color: #fff !important;
+  border-right-color: #555 !important;
+}
+
+/* Estilos para o Content (onde o MainCalendar é renderizado) no tema dark */
+.dark-theme .ant-layout-content {
+  background-color:#333 !important;
+  color: #f0f0f0 !important;
+}
+
+/* Estilos para o MainCalendar (assumindo que ele usa algum componente do Ant Design como Calendar ou DatePicker) */
+.dark-theme .ant-picker {
+  background-color: #444 !important;
+  color: #f0f0f0 !important;
+  border-color: #555 !important;
+}
+
+.dark-theme .ant-picker-input > input {
+  color: #f0f0f0 !important;
+}
+
+.dark-theme .ant-picker-panel {
+  background-color: #333 !important;
+  color: #f0f0f0 !important;
+}
+
+.dark-theme .ant-picker-header-view button {
+  color: #f0f0f0 !important;
+}
+
+.dark-theme .ant-picker-cell-inner {
+  color: #f0f0f0 !important;
+}
+
+.dark-theme .ant-picker-cell-selected .ant-picker-cell-inner,
+.dark-theme .ant-picker-cell-today .ant-picker-cell-inner {
+  background-color: var(--primary-color) !important;
+  color: #1e1e1e !important;
+}
+
+/* Se o MainCalendar tiver estilos próprios, você precisará inspecionar e adicionar regras aqui */
+.dark-theme .main-calendar-custom-class { /* Substitua pela classe real do seu MainCalendar */
+  background-color: #333 !important;
+  color: #f0f0f0 !important;
+}
+
+/* Se os itens do RightMenu precisarem de estilos específicos */
+/* Inspecione as classes dentro do seu RightMenu component */
+.dark-theme .right-menu-item-class { /* Substitua pela classe real dos itens do menu */
+  color: #f0f0f0 !important;
+}
+
+.dark-theme .home{
+  background-color: #1e1e1e !important;
+  color: #f0f0f0 !important;
+}
+
+/*Estilizando com o tema - dark theme o RigthMenu*/
+/* Estilos para o container do RightMenu */
+.dark-theme > div[style*="width: 256px"] { /* Seleciona o div com largura de 256px */
+  background-color: #282828 !important; /* Cor de fundo escura */
+  color: #f0f0f0 !important; /* Cor do texto clara */
+}
+
+/* Estilos para o componente Menu do Ant Design */
+.dark-theme .right-menu.ant-menu {
+  background: #282828 !important;
+  color: #f0f0f0 !important;
+}
+
+
+/* Estilos para o botão "Novo Agendamento" */
+.dark-theme #btn-new-meeting.ant-btn {
+  background-color: #333 !important;
+  color: #f0f0f0 !important;
+  border-color: #555 !important;
+}
+
+.dark-theme #btn-new-meeting.ant-btn:hover,
+.dark-theme #btn-new-meeting.ant-btn:focus {
+  background-color: #444 !important;
+  color: #fff !important;
+  border-color: #666 !important;
+}
+
+
+.dark-theme .ant-picker-calendar-header {
+  background-color: #333 !important;
+  color: #f0f0f0 !important;
+}
+
+
+.dark-theme .ant-menu-item-selected {
+  background-color: #a7b1b8 !important;
+  color: #fff !important;
+}
+
+
+
+
+
+
