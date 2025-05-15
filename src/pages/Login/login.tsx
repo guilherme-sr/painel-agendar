@@ -32,6 +32,7 @@ const Login: React.FC = () => {
           password: values.password,
         }
       );
+      
       console.log("Resposta do servidor:", response.data);
       localStorage.setItem("token", response.data.jwt);
       window.location.href = "/";
