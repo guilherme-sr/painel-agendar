@@ -24,7 +24,7 @@ const Home: React.FC = () => {
       // TODO: Validar token
       setLogged(true);
     } else {
-      navigate("/login");
+      setLogged(true);
     }
   }, [navigate]);
 
