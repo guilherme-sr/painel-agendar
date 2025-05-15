@@ -23,8 +23,7 @@ interface ModalProps {
   userId: number;
 }
 
-const NewMeeting: React.FC<ModalProps> = (props) => {
-  const { closeModal, userId } = props;
+const NewMeeting: React.FC<ModalProps> = ({ closeModal, userId }) => {
   const { rooms } = useContext(RoomsContext);
 
   const [meeting, setMeeting] = useState({
@@ -35,20 +34,18 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
     room: "",
     creator: 0,
   });
+
   const [endMinutes, setEndMinutes] = useState<number>(15);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [participants, setParticipants] = useState<string[]>([]);
   const [currentEmail, setCurrentEmail] = useState("");
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (success) {
-      message.open({
-        type: "success",
-        content: "Agendamento Criado com Sucesso!",
-        duration: 7,
-      });
+      message.success("Agendamento Criado com Sucesso!", 7);
       setSuccess(false);
       closeModal();
     }
@@ -56,15 +53,12 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
 
   useEffect(() => {
     if (error) {
-      message.open({
-        type: "error",
-        content: "Falha ao Criar Agendamento",
-      });
+      message.error("Falha ao Criar Agendamento");
       setError(false);
     }
   }, [error]);
 
-  const handleKeyDown = (e: any) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && isValidEmail(currentEmail)) {
       if (!participants.includes(currentEmail)) {
         setParticipants([...participants, currentEmail]);
@@ -76,64 +70,71 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
   };
 
   const isValidEmail = (email: string) => {
-    // Expressão regular para validar o formato do email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
   };
 
-  const updateMeetingField = (field: any, value: any) => {
-    setMeeting((prevState) => ({
-      ...prevState,
+  const updateMeetingField = (field: string, value: any) => {
+    setMeeting((prev) => ({
+      ...prev,
       [field]: value,
     }));
   };
 
-  const removeParticipant = (notParticipant: any) => {
-    setParticipants(participants.filter((pt) => pt !== notParticipant));
-  };
-
-  const getSelectRooms = (rooms: {
-    [x: string]: any;
-    hasOwnProperty: (arg0: string) => any;
-  }) => {
-    for (const key in rooms) {
-      if (rooms.hasOwnProperty(key)) {
-        const room = rooms[key];
-      }
-    }
+  const removeParticipant = (emailToRemove: string) => {
+    setParticipants(participants.filter((email) => email !== emailToRemove));
   };
 
   const getRoomId = (roomKey: string) => {
     const reId = /\d.*$/;
-    return reId.exec(roomKey);
+    return reId.exec(roomKey)?.[0] || "";
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(meeting);
     setLoading(true);
     setError(false);
     setSuccess(false);
+
     const final_meeting = {
       ...meeting,
       creator: userId,
-      end: dayjs(dayjs(meeting.start).add(endMinutes, "minute"))
-        .format("YYYY-MM-DD HH:mm:ss")
-        .toString(),
+      end: dayjs(dayjs(meeting.start).add(endMinutes, "minute")).format("YYYY-MM-DD HH:mm:ss"),
       room: getRoomId(meeting.room),
     };
-    console.log(final_meeting);
+
     try {
-      const response = await axios.post(
+      // Primeiro, envia a ata se houver
+      let uploadedFileUrl = null;
+      if (file) {
+        const formData = new FormData();
+        formData.append("files", file);
+
+        const fileUploadResponse = await axios.post("http://localhost:1337/api/upload", formData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        uploadedFileUrl = fileUploadResponse.data[0]?.url;
+      }
+
+      // Em seguida, cria a reunião com ou sem o link da ata
+      const payload = {
+        ...final_meeting,
+        participants,
+        ata_url: uploadedFileUrl,
+      };
+
+      await axios.post(
         "http://localhost:1337/api/meetings",
-        { data: final_meeting },
+        { data: payload },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
-      console.log(response);
 
       setMeeting({
         name: "",
@@ -143,9 +144,12 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
         room: "",
         creator: 0,
       });
+      setFile(null);
+      setParticipants([]);
       setLoading(false);
       setSuccess(true);
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       setLoading(false);
       setError(true);
     }
@@ -162,73 +166,52 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
         <Button disabled={loading} key="back" onClick={closeModal}>
           Cancelar
         </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={handleSubmit}
-        >
+        <Button key="submit" type="primary" loading={loading} onClick={handleSubmit}>
           Salvar
         </Button>,
       ]}
     >
-      <Form
-        name="basic"
-        initialValues={{ remember: true }}
-        layout="vertical"
-        className="form-modal"
-      >
+      <Form layout="vertical" className="form-modal">
         <Form.Item
           label="Nome"
           name="name"
           rules={[{ required: true, message: "Insira o nome do agendamento!" }]}
         >
-          <Input
-            value={meeting.name}
-            onChange={(e) => updateMeetingField("name", e.target.value)}
-          />
+          <Input value={meeting.name} onChange={(e) => updateMeetingField("name", e.target.value)} />
         </Form.Item>
+
         <Flex gap="large">
           <Form.Item
             label="Início"
             name="start"
-            rules={[
-              { required: true, message: "Insira a data e hora de início!" },
-            ]}
+            rules={[{ required: true, message: "Insira a data e hora de início!" }]}
           >
             <DatePicker
               showTime
-              minDate={dayjs(dayjs(), dateFormat)}
-              value={meeting.start}
-              // defaultValue={"2027-04-04 08:13:00"}
-
-              onChange={(_, dateString) => {
-                updateMeetingField("start", dateString);
-              }}
+              format="DD-MM-YYYY HH:mm"
+              value={meeting.start ? dayjs(meeting.start, "YYYY-MM-DD HH:mm:ss") : null}
+              onChange={(_, dateString) => updateMeetingField("start", dateString)}
             />
           </Form.Item>
+
           <Form.Item
             label="Duração"
             name="time"
-            rules={[
-              { required: true, message: "Selecione o tempo de duração!" },
-            ]}
+            rules={[{ required: true, message: "Selecione o tempo de duração!" }]}
           >
             <Select
               value={endMinutes}
-              defaultValue={endMinutes}
-              onChange={(value) => {
-                setEndMinutes(value);
-              }}
+              onChange={setEndMinutes}
               options={[
-                { value: 15, label: <span>15 min.</span> },
-                { value: 30, label: <span>30 min.</span> },
-                { value: 60, label: <span>60 min.</span> },
-                { value: 90, label: <span>90 min.</span> },
+                { value: 15, label: "15 min." },
+                { value: 30, label: "30 min." },
+                { value: 60, label: "60 min." },
+                { value: 90, label: "90 min." },
               ]}
             />
           </Form.Item>
         </Flex>
+
         <Form.Item
           label="Sala"
           name="room"
@@ -237,21 +220,17 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
           <Select
             value={meeting.room}
             onChange={(value) => updateMeetingField("room", value)}
-            options={rooms.map((room) => {
-              return {
-                value: room.id,
-                label: (
-                  <span>
-                    <span>
-                      <XFilled style={{ color: room.attributes.color }} />
-                    </span>
-                    {room.attributes.name}
-                  </span>
-                ),
-              };
-            })}
+            options={rooms.map((room) => ({
+              value: room.id,
+              label: (
+                <span>
+                  <XFilled style={{ color: room.attributes.color }} /> {room.attributes.name}
+                </span>
+              ),
+            }))}
           />
         </Form.Item>
+
         <Form.Item label="Descrição" name="description">
           <Input.TextArea
             value={meeting.description}
@@ -259,6 +238,7 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
             autoSize={{ minRows: 2, maxRows: 6 }}
           />
         </Form.Item>
+
         <Form.Item label="Participantes" name="participants">
           <Input
             value={currentEmail}
@@ -266,18 +246,27 @@ const NewMeeting: React.FC<ModalProps> = (props) => {
             onKeyDown={handleKeyDown}
           />
         </Form.Item>
+
         <Form.Item>
           <div style={{ marginTop: 10 }}>
             {participants.map((email, index) => (
-              <Tag
-                key={index}
-                closable
-                onClose={() => removeParticipant(email)}
-              >
+              <Tag key={index} closable onClose={() => removeParticipant(email)}>
                 {email}
               </Tag>
             ))}
           </div>
+        </Form.Item>
+        
+        <Form.Item label="Ata da reunião (PDF ou Word)">
+          <Input
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                setFile(e.target.files[0]);
+              }
+            }}
+          />
         </Form.Item>
       </Form>
     </Modal>

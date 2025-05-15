@@ -9,6 +9,7 @@ import {
   Tag,
   message,
   Flex,
+  Checkbox,
 } from "antd";
 import dayjs from "dayjs";
 import { XFilled } from "@ant-design/icons";
@@ -34,6 +35,8 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
   const [participants, setParticipants] = useState<string[]>([]);
   const [currentEmail, setCurrentEmail] = useState("");
   const [userData, setUserData] = useState<userDataInterface>({ id: 0 });
+  const [ataNaoNecessaria, setAtaNaoNecessaria] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -90,7 +93,6 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
   };
 
   const isValidEmail = (email: string) => {
-    // Expressão regular para validar o formato do email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
   };
@@ -119,8 +121,21 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
       room: values.room,
       creator: userData.id,
       end: getEndDate(values.startDate, values.duration),
+      ata_nao_necessaria: ataNaoNecessaria, // Adicionando campo para ata não necessária
     };
-    console.log(final_meeting);
+
+    if (file && !ataNaoNecessaria) {
+      // Enviar arquivo se não for "ata não necessária"
+      const formData = new FormData();
+      formData.append("ata", file);
+      await axios.post("http://localhost:1337/api/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+    }
+
     try {
       const response = await axios.post(
         "http://localhost:1337/api/meetings",
@@ -270,6 +285,26 @@ const CreateMeeting: React.FC<ModalProps> = (props) => {
             ))}
           </div>
         </Form.Item>
+        
+        <Form.Item>
+          <Checkbox
+            checked={ataNaoNecessaria}
+            onChange={(e) => setAtaNaoNecessaria(e.target.checked)}
+          >
+            Não é necessário ata para esta reunião
+          </Checkbox>
+        </Form.Item>
+
+        {!ataNaoNecessaria && (
+          <Form.Item label="Ata da Reunião">
+            <Input
+              type="file"
+              accept=".pdf,.docx"
+              onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+            />
+          </Form.Item>
+        )}
+
         <Flex justify={"flex-end"} align={"center"} gap={"small"}>
           <Form.Item>
             <Button disabled={loading} onClick={closeModal}>
